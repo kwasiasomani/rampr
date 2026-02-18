@@ -36,7 +36,7 @@ print(Z_sd.head())
 # national Output from make_io dataframe
 df_make_output = io_make_output(list(reversed(industries)))
 
-# Kendrick-Jaycox for San Diego, Kansas
+# Kendrick-Jaycox for San Diego
 df_kjc = kjc_share(df_make_output,
                    emp, 'emp', geo='06073',year=2022)
 print(df_kjc.tail())

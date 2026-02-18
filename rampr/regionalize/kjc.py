@@ -39,11 +39,9 @@ def kjc_share(
     else:
         raise ValueError("df1 must have exactly 2 columns: [industry, output]")
 
-    # align the regional employment industries with national output
-   # e_ir = e_ir.reindex(x_i.index)
-   # e_i = e_i.reindex(x_i.index)
+  
 
-    share = (e_ir / e_i).reindex(x_i.index)  # find the regional share first
+    share = (e_ir / e_i).reindex(x_i.index)  # find the regional share first and align it
     
     # constraint checking
     neg = share.values < 0
