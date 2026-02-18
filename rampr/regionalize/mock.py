@@ -94,3 +94,31 @@ def make_mock_employment(
     out = pd.concat(rows, ignore_index=True)
     out["emp"] = out["emp"].clip(lower=0.0)
     return out
+
+from typing import List
+import numpy as np
+import pandas as pd
+
+def io_make_output(industry: list[str]) -> pd.DataFrame:
+    """
+    Simulate national output by industry from IOMake.
+    Returns a DataFrame with columns: industry, output.
+    """
+    inds = list(industry)
+    n = len(inds)
+    if n == 0:
+        return pd.DataFrame(columns=["industry", "output"])
+
+    rng = np.random.default_rng(42)
+
+    # Base outputs mostly in 10k–70k
+    base = rng.uniform(10_000, 70_000, size=n)
+
+    # Multiplicative noise
+    sigma = 0.35 / np.sqrt(n)  
+    factor = rng.lognormal(mean=-0.5 * sigma**2, sigma=sigma, size=n) 
+
+    output = base * factor
+    output = np.clip(output, 10_000, None).round() 
+
+    return pd.DataFrame({"industry": inds, "output": output})

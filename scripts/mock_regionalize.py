@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from rampr.regionalize.mock import make_mock_employment
+from rampr.regionalize.mock import make_mock_employment, io_make_output
+from rampr.regionalize.kjc import kjc_share
 from rampr.regionalize.lq import slq_table
 from rampr.regionalize.regionalize import regionalize_io
 
@@ -31,3 +32,11 @@ print(slq_table(emp, year=2023).round(2))
 # Regionalize for San Diego (06073), 2023
 Z_sd = regionalize_io(Z_nat, emp, geo="06073", year=2023, method="sqrt_slq")
 print(Z_sd.head())
+
+# national Output from make_io dataframe
+df_make_output = io_make_output(list(reversed(industries)))
+
+# Kendrick-Jaycox for San Diego, Kansas
+df_kjc = kjc_share(df_make_output,
+                   emp, 'emp', geo='06073',year=2022)
+print(df_kjc.tail())
