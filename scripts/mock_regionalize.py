@@ -36,7 +36,14 @@ print(Z_sd.head())
 # national Output from make_io dataframe
 df_make_output = io_make_output(list(reversed(industries)))
 
-# Kendrick-Jaycox for San Diego
-df_kjc = kjc_share(df_make_output,
-                   emp, 'emp', geo='06073',year=2022)
-print(df_kjc.tail())
+# Kendrick jaycox for all regions
+df_kjc_all = kjc_share(df_make_output, emp, 'emp', 'industry',
+                   year=2022 )
+# Kendrick jaycox for only San Diego Region
+df_kjc_sd = kjc_share(df_make_output, emp, 'emp', 'industry',
+                   year=2022, geo='06073' )
+print(" All Regions ")
+print(df_kjc_all.tail())
+
+print("\nSan Diego Only ")
+print(df_kjc_sd.head())
