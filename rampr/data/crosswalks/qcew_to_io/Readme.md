@@ -108,22 +108,4 @@ The following sectors are missing and not present in the QCEW sectors:
 ]
 ```
 
-## Imputation of the 5 Sectors (KNN)
-
-This step makes sure every `(year, area_fips)` has the full set of required `io_sector` rows.  
-If a sector is missing, we add it and then fill the missing numeric values using KNN imputation.
-
-### What this script does
-1. Loads the main dataset and the list of sectors that must exist.
-2. For every `(year, area_fips)`, adds any missing `io_sector` rows (with NaNs in target columns).
-3. Uses KNN to impute the missing values for:
-   - `tap_estabs_count`
-   - `tap_wages_est_3`
-   - `tap_emplvl_est_3`
-
-### Assumptions (simple)
-- The `missing_sectors` file contains the **complete list of sectors** that should appear for every `(year, area_fips)`.
-- Sectors are considered **similar** if they share the same first **3–6 characters** of the `io_sector` code.
-- Missing values can be estimated using **similar sectors** and an **area feature** (`area_fips` converted to a numeric feature).
-- Target values are assumed to be **non-negative**, and a log transform is used to improve imputation.
-- The imputation can use neighbors from **different years** (it is not limited to the same year).
+These sectors are not in the qcew_sectors dataset.
