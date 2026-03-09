@@ -1,4 +1,4 @@
-from rampr.bridge import build_crosswalk, align_io_to_bea_402, data_path, impute_missing_sectors
+from rampr.bridge import build_crosswalk, align_io_to_bea_402, data_path
 from rampr.datasets import fetch
 
 # Fetch QCEW 409 data from zenodo
@@ -17,19 +17,13 @@ cw = build_crosswalk(
 )
 
 print("\nAligning to BEA 402 and imputing missing values together...")
-bea_codes = data_path("bea_402_sector_codes")          # default filename
-missing_sectors_csv = data_path("crosswalk_dir") / "missing_sectors.csv"  # if you didn't add a key
+bea_codes = data_path("bea_402_sector_codes")         
+missing_sectors_csv = data_path("crosswalk_dir") / "missing_sectors.csv"  
 
 df_bridge = align_io_to_bea_402(io_agg_df=cw.io_agg_df, codes_file=bea_codes)
-df_imputation = impute_missing_sectors(df_bridge, missing_sectors_csv)
-df_final_bridge = align_io_to_bea_402(df_imputation, codes_file=bea_codes)
-
+df_bridge.to_csv('../rampr/archive/data/output/bridge_402.csv', index=False)
 # checking shape to see they match 402 by filtering with the area_fips
 print("\nSan Diego")
 san_diego = "06073"
-print(df_final_bridge[df_final_bridge["area_fips"] == san_diego].shape)
-
-# Save the final bridge with imputation
-output_path = data_path("repo_root") / "bridge.csv"
-df_final_bridge.to_csv(output_path, index=False)
+print(df_bridge[df_bridge["area_fips"] == san_diego].shape)
 

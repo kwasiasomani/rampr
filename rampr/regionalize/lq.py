@@ -1,42 +1,32 @@
-# rampr/regionalize/lq.py
 from __future__ import annotations
+import pandas as pd, numpy as np
 
-import pandas as pd
-
-
-def slq(emp: pd.DataFrame, *, geo: str, year: int | None = None) -> pd.Series:
-    """
-    Simple LQ per industry for a given geo (and optional year).
-
-    emp columns: geo, year (optional), industry, emp
-    Returns a Series indexed by industry.
-    """
+def slq_table(
+    emp: pd.DataFrame,
+    emp_col: str,
+    io_sector: str,
+    geo_col: str,
+    *,
+    year: int | None = None,
+) -> pd.DataFrame:
+    """SLQ for all geos x industries (wide) ."""
     df = emp.copy()
+
+    if df[geo_col].dtype != "object":
+        df[geo_col] = df[geo_col].astype(str)
     if year is not None and "year" in df.columns:
         df = df[df["year"] == year]
 
-    reg = df[df["geo"] == geo].groupby("industry")["emp"].sum()
-    nat = df.groupby("industry")["emp"].sum()
+    pivot = df.pivot(index=geo_col, columns=io_sector, values=emp_col)
 
-    reg_tot = reg.sum()
+    reg = pivot.to_numpy()
+    reg_tot = reg.sum(axis=1, keepdims=True)
+    nat     = reg.sum(axis=0, keepdims=True)
     nat_tot = nat.sum()
-
-    # align industries
-    reg = reg.reindex(nat.index).fillna(0.0)
+    
     lq = (reg / reg_tot) / (nat / nat_tot)
-    return lq
 
-
-def slq_table(emp: pd.DataFrame, *, year: int | None = None) -> pd.DataFrame:
-    """SLQ for all geos x industries (wide)."""
-    geos = emp["geo"].unique()
-    inds = emp["industry"].unique()
-    out = []
-    for g in geos:
-        s = slq(emp, geo=g, year=year)
-        s.name = g
-        out.append(s)
-    tab = pd.concat(out, axis=1).T
-    tab.index.name = "geo"
-    tab = tab.reindex(columns=sorted(inds))
-    return tab
+    tab = pd.DataFrame(lq, index=pivot.index, columns=pivot.columns)
+    tab.index.name   = geo_col
+    tab.columns.name = io_sector
+    return tab.reindex(columns=sorted(tab.columns))
